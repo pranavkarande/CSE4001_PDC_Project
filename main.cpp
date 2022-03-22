@@ -1,6 +1,6 @@
 #include <iostream>
-#include <vector>
 #include <queue>
+#include <vector>
 
 using namespace std;
 
@@ -80,9 +80,7 @@ void graph::BFS_serial(node &s) {
   Q.push(s);
 
   while (!Q.empty()) {
-   
   }
-
 }
 
 int main(void) {
