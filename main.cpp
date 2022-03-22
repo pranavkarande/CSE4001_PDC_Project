@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <queue>
 
 using namespace std;
 
@@ -63,11 +64,26 @@ public:
   }
 
   // Serial BFS
-  void BFS_serial(node);
+  void BFS_serial(node &);
 };
 
 // TODO Implement serial BFS
-void graph::BFS_serial(node s) {}
+void graph::BFS_serial(node &s) {
+  // BFS Queue
+  queue<node> Q;
+
+  // Distance of source will be 0
+  s.d = 0;
+  // Source has been discovered
+  s.discovered = true;
+
+  Q.push(s);
+
+  while (!Q.empty()) {
+   
+  }
+
+}
 
 int main(void) {
   graph G(10);
