@@ -8,7 +8,7 @@ using namespace std;
 class node {
 public:
   // Each node has an integer ID corrosponding
-  // to it's index in the edgeMatrix
+  // to it's index in edgeMatrix
   short unsigned int id;
 
   // Static counter to assign default value to id
@@ -47,8 +47,7 @@ public:
     no_of_nodes = n;
 
     // Initialize edgeMatrix
-    edgeMatrix =
-        vector<vector<bool>>(n, vector<bool>(n));
+    edgeMatrix = vector<vector<bool>>(n, vector<bool>(n));
 
     // Initialize node vector
     node::counter = 0;
@@ -76,7 +75,7 @@ public:
     cout << "Node ID\t\tDistance" << endl;
     cout << "-------------------" << endl;
     for (auto i : N) {
-      cout << i.id << "\t\t" << i.d << endl;;
+      cout << i.id << "\t\t" << i.d << endl;
     }
     cout << "-------------------" << endl;
   }
