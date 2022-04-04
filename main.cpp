@@ -1,6 +1,9 @@
 #include <iostream>
 #include <queue>
 #include <vector>
+#include <omp.h>
+
+#define NO_OF_THREADS 4
 
 using namespace std;
 
@@ -15,18 +18,22 @@ public:
   inline static short unsigned int counter = 0;
 
   // Has node been discoverd by BFS
-  bool discovered;
+  bool discovered_serial;
+  bool discovered_parallel;
 
   // Distance form root node chosen for BFS
   // d = 0 for root node
-  short int d;
+  short int d_serial;
+  short int d_parallel;
 
   // Construct undiscovered node with
   // infinite(-1) distance form root
   Node() {
     id = counter++;
-    discovered = false;
-    d = -1;
+    discovered_serial = false;
+    discovered_parallel = false;
+    d_serial = -1;
+    d_parallel = -1;
   }
 };
 
@@ -71,16 +78,20 @@ public:
 
   // Print distance of all nodes after BFS
   void print_distance() {
-    cout << "Node ID\t|Distance" << endl;
-    cout << "--------|--------" << endl;
+    cout << "Node ID\t|Serial\t |Parallel" << endl;
+    cout << "\t|Distance|Distance" << endl;
+    cout << "--------|--------|--------" << endl;
     for (auto i : N) {
-      cout << i.id << "\t|" << i.d << endl;
+      cout << i.id << "\t|" << i.d_serial << "\t |" << i.d_parallel << endl;
     }
-    cout << "--------|--------" << endl;
+    cout << "--------|--------|--------" << endl;
   }
 
   // Serial BFS
   void BFS_serial(unsigned short int);
+
+  // TODO Implement Parallel BFS
+  void BFS_parallel(unsigned short int);
 };
 
 void Graph::BFS_serial(unsigned short int s_id) {
@@ -91,9 +102,10 @@ void Graph::BFS_serial(unsigned short int s_id) {
   queue<Node *> Q;
 
   // Distance of source will be 0
-  s->d = 0;
+  s->d_serial = 0;
+
   // Source has been discovered
-  s->discovered = true;
+  s->discovered_serial = true;
 
   Q.push(s);
 
@@ -102,17 +114,49 @@ void Graph::BFS_serial(unsigned short int s_id) {
     Node *u = Q.front();
     Q.pop();
     for (int v = 0; v < no_of_nodes; ++v) {
-      if ((edgeMatrix[u->id][v] != false) && (!N[v].discovered)) {
-        N[v].discovered = true;
-        N[v].d = u->d + 1;
+      if ((edgeMatrix[u->id][v]) && (!N[v].discovered_serial)) {
+        N[v].discovered_serial = true;
+        N[v].d_serial = u->d_serial + 1;
         Q.push(&N[v]);
       }
     }
-    u->discovered = true;
+    u->discovered_serial = true;
+  }
+}
+
+void Graph::BFS_parallel(unsigned short int s_id) {
+  // s is now pointer to source
+  Node *s = &N[s_id];
+
+  // BFS Queue
+  queue<Node *> Q;
+
+  // Distance of source will be 0
+  s->d_parallel = 0;
+
+  // Source has been discovered
+  s->discovered_parallel = true;
+
+  Q.push(s);
+
+  // BFS algorithm
+  while (!Q.empty()) {
+    Node *u = Q.front();
+    Q.pop();
+    #pragma omp parallel for
+    for (int v = 0; v < no_of_nodes; ++v) {
+      if ((edgeMatrix[u->id][v]) && (!N[v].discovered_parallel)) {
+        N[v].discovered_parallel = true;
+        N[v].d_parallel = u->d_parallel + 1;
+        Q.push(&N[v]);
+      }
+    }
+    u->discovered_parallel = true;
   }
 }
 
 int main(void) {
+  omp_set_num_threads(NO_OF_THREADS);
   Graph G(18);
 
   G.add_edge(0, 4);
@@ -146,5 +190,6 @@ int main(void) {
   G.add_edge(15, 14);
 
   G.BFS_serial(0);
+  G.BFS_parallel(0);
   G.print_distance();
 }
