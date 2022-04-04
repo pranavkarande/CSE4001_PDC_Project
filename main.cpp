@@ -72,12 +72,12 @@ public:
 
   // Print distance of all nodes after BFS
   void print_distance() {
-    cout << "Node ID\t\tDistance" << endl;
-    cout << "-------------------" << endl;
+    cout << "Node ID\t|Distance" << endl;
+    cout << "--------|--------" << endl;
     for (auto i : N) {
-      cout << i.id << "\t\t" << i.d << endl;
+      cout << i.id << "\t|" << i.d << endl;
     }
-    cout << "-------------------" << endl;
+    cout << "--------|--------" << endl;
   }
 
   // Serial BFS
