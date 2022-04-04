@@ -1,6 +1,9 @@
 #include <iostream>
 #include <queue>
 #include <vector>
+#include<string>
+#include<fstream>
+#include<sstream>
 
 using namespace std;
 
@@ -37,7 +40,7 @@ public:
   unsigned short int no_of_nodes;
 
   // Edge matrix vector
-  vector<vector<bool>> edgeMatrix;
+  vector<vector<bool> > edgeMatrix;
 
   // Node vector
   vector<Node> N;
@@ -47,7 +50,7 @@ public:
     no_of_nodes = n;
 
     // Initialize edgeMatrix
-    edgeMatrix = vector<vector<bool>>(n, vector<bool>(n));
+    edgeMatrix = vector<vector<bool> >(n, vector<bool>(n));
 
     // Initialize node vector
     N = vector<Node>(n);
@@ -113,37 +116,55 @@ void Graph::BFS_serial(unsigned short int s_id) {
 }
 
 int main(void) {
-  Graph G(18);
 
-  G.add_edge(0, 4);
-  G.add_edge(4, 1);
-  G.add_edge(0, 1);
-  G.add_edge(5, 4);
-  G.add_edge(2, 5);
-  G.add_edge(5, 6);
-  G.add_edge(4, 7);
-  G.add_edge(4, 8);
-  G.add_edge(8, 5);
-  G.add_edge(9, 5);
-  G.add_edge(9, 6);
-  G.add_edge(6, 10);
-  G.add_edge(7, 8);
-  G.add_edge(8, 9);
-  G.add_edge(7, 14);
-  G.add_edge(11, 7);
-  G.add_edge(9, 13);
-  G.add_edge(10, 17);
-  G.add_edge(11, 12);
-  G.add_edge(12, 13);
-  G.add_edge(13, 16);
-  G.add_edge(13, 17);
-  G.add_edge(14, 15);
-  G.add_edge(6, 5);
-  G.add_edge(8, 7);
-  G.add_edge(12, 11);
-  G.add_edge(13, 12);
-  G.add_edge(16, 13);
-  G.add_edge(15, 14);
+  ifstream fin; 
+  string line; int n=0;
+ 
+  // by default open mode = ios::in mode
+  fin.open("p2p-Gnutella08.txt");
+
+  // Execute a loop until EOF (End of File)
+  while (fin) {
+ 
+  // Read a Line from File
+  getline(fin, line);
+ 
+  // Print line in Console
+  if (line[0] != '#')
+    {
+      n = stoi(line);
+      cout << line << endl;
+      break;
+    }
+  }
+
+  Graph G(n);
+
+  while (fin) {
+
+    // Read a Line from File
+    getline(fin, line);
+
+    istringstream ss(line);
+  
+    string word; // for storing each word
+  
+    // Traverse through all words
+    // while loop till we get 
+    // strings to store in string word
+    while (ss >> word) 
+    {
+        int n1 = stoi(word);
+        ss >> word;
+        int n2 = stoi(word);
+
+        G.add_edge(n1, n2);
+    }
+
+  }
+ 
+  // Close the file
+  fin.close();
 
   G.BFS_serial(0);
   G.print_distance();
