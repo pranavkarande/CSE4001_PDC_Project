@@ -52,20 +52,37 @@ public:
   // Node vector
   vector<Node> N;
 
-  // Construct trivial graph with n nodes
-  Graph(int n) {
-    no_of_nodes = n;
+  // Construct graph from dataset
+  Graph(string filename) {
+    ifstream dataset_stream(filename);
+    string line;
+
+    // Read number of nodes and initialize graph
+    while (getline(dataset_stream, line)) {
+      if (line[0] != '#') {
+        no_of_nodes = stoi(line);
+        break;
+      }
+    }
 
     // Initialize edgeMatrix
-    edgeMatrix = vector<vector<bool>>(n, vector<bool>(n));
+    edgeMatrix = vector<vector<bool>>(no_of_nodes, vector<bool>(no_of_nodes));
+
+    // Read node pairs and add edge
+    while (getline(dataset_stream, line)) {
+      istringstream nodepair(line);
+      string word;
+
+      nodepair >> word;
+      unsigned short int n1 = stoi(word);
+      nodepair >> word;
+      edgeMatrix[n1][stoi(word)] = true;
+    }
+
+    dataset_stream.close();
 
     // Initialize node vector
-    N = vector<Node>(n);
-  }
-
-  // Add edge from node s to node d
-  void add_edge(unsigned short int s, unsigned short int d) {
-    edgeMatrix[s][d] = true;
+    N = vector<Node>(no_of_nodes);
   }
 
   // Print adjacency matrix
@@ -162,31 +179,7 @@ void Graph::BFS_parallel(unsigned short int s_id) {
 int main(void) {
   omp_set_num_threads(NO_OF_THREADS);
 
-  ifstream dataset_stream("test.txt");
-  string line;
-  unsigned short int no_of_nodes;
-
-  // Read number of nodes and initialize graph
-  while (getline(dataset_stream, line)) {
-    if (line[0] != '#') {
-      no_of_nodes = stoi(line);
-      break;
-    }
-  }
-  Graph G(no_of_nodes);
-
-  // Read node pairs and add edge
-  while (getline(dataset_stream, line)) {
-    istringstream nodepair(line);
-    string word;
-
-    nodepair >> word;
-    unsigned short int n1 = stoi(word);
-    nodepair >> word;
-    G.add_edge(n1, stoi(word));
-  }
-
-  dataset_stream.close();
+  Graph G("test.txt");
 
   G.BFS_serial(0);
   G.BFS_parallel(0);
