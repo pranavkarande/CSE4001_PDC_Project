@@ -1,8 +1,8 @@
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <omp.h>
 #include <queue>
-#include <sstream>
 #include <string>
 #include <vector>
 
@@ -162,84 +162,31 @@ void Graph::BFS_parallel(unsigned short int s_id) {
 int main(void) {
   omp_set_num_threads(NO_OF_THREADS);
 
-  // Graph G(18);
-
-  // G.add_edge(0, 4);
-  // G.add_edge(4, 1);
-  // G.add_edge(0, 1);
-  // G.add_edge(5, 4);
-  // G.add_edge(2, 5);
-  // G.add_edge(5, 6);
-  // G.add_edge(4, 7);
-  // G.add_edge(4, 8);
-  // G.add_edge(8, 5);
-  // G.add_edge(9, 5);
-  // G.add_edge(9, 6);
-  // G.add_edge(6, 10);
-  // G.add_edge(7, 8);
-  // G.add_edge(8, 9);
-  // G.add_edge(7, 14);
-  // G.add_edge(11, 7);
-  // G.add_edge(9, 13);
-  // G.add_edge(10, 17);
-  // G.add_edge(11, 12);
-  // G.add_edge(12, 13);
-  // G.add_edge(13, 16);
-  // G.add_edge(13, 17);
-  // G.add_edge(14, 15);
-  // G.add_edge(6, 5);
-  // G.add_edge(8, 7);
-  // G.add_edge(12, 11);
-  // G.add_edge(13, 12);
-  // G.add_edge(16, 13);
-  // G.add_edge(15, 14);
-
-  ifstream fin;
+  ifstream dataset_stream("test.txt");
   string line;
-  int n = 0;
+  unsigned short int no_of_nodes;
 
-  // by default open mode = ios::in mode
-  fin.open("test.txt");
-
-  // Execute a loop until EOF (End of File)
-  while (fin) {
-    // Read a Line from File
-    getline(fin, line);
-
-    // Print line in Console
+  // Read number of nodes and initialize graph
+  while (getline(dataset_stream, line)) {
     if (line[0] != '#') {
-      n = stoi(line);
-      cout << line << endl;
+      no_of_nodes = stoi(line);
       break;
     }
   }
+  Graph G(no_of_nodes);
 
-  Graph G(n);
-
-  while (fin) {
-
-    // Read a Line from File
-    getline(fin, line);
-
-    istringstream ss(line);
-
-    // For storing each word
+  // Read node pairs and add edge
+  while (getline(dataset_stream, line)) {
+    istringstream nodepair(line);
     string word;
 
-    // Traverse through all words
-    // while loop till we get
-    // strings to store in string word
-    while (ss >> word) {
-      unsigned short int n1 = stoi(word);
-      ss >> word;
-      unsigned short int n2 = stoi(word);
-
-      G.add_edge(n1, n2);
-    }
+    nodepair >> word;
+    unsigned short int n1 = stoi(word);
+    nodepair >> word;
+    G.add_edge(n1, stoi(word));
   }
 
-  // Close the file
-  fin.close();
+  dataset_stream.close();
 
   G.BFS_serial(0);
   G.BFS_parallel(0);
