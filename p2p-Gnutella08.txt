@@ -2,7 +2,7 @@
 # Directed Gnutella P2P network from August 8 2002
 # Nodes: 6301 Edges: 20777
 # FromNodeId	ToNodeId
-6301
+6301 6031
 0 1
 0	2
 0	3
