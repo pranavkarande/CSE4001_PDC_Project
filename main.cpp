@@ -230,7 +230,7 @@ double Graph::BFS_parallel(unsigned long int s_id) {
   while (!Q.empty()) {
     u = Q.front();
     Q.pop();
-    #pragma omp parallel for
+    #pragma omp parallel for schedule(auto)
     for (unsigned long int v = 0; v < no_of_nodes; ++v) {
       if ((edgeMatrix[u->id][v]) && (!N[v].discovered_parallel)) {
         N[v].discovered_parallel = true;
@@ -259,9 +259,9 @@ double Graph::BFS_parallel(unsigned long int s_id) {
 int main(void) {
   omp_set_num_threads(NO_OF_THREADS);
 
-  // Graph G("soc-Epinions1.txt");
+  Graph G("soc-Epinions1.txt");
   // Graph G("test.txt");
-  Graph G("p2p-Gnutella08.txt");
+  // Graph G("p2p-Gnutella08.txt");
 
   double serial_time = G.BFS_serial(0);
   cout << "\nSerial time: " << serial_time << " seconds" << endl;
