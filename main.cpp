@@ -163,7 +163,6 @@ void Graph::BFS_parallel(unsigned short int s_id) {
   while (!Q.empty()) {
     Node *u = Q.front();
     Q.pop();
-    #pragma omp parallel for
     for (int v = 0; v < no_of_nodes; ++v) {
       if ((edgeMatrix[u->id][v]) && (!N[v].discovered_parallel)) {
         N[v].discovered_parallel = true;
