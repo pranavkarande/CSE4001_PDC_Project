@@ -58,6 +58,8 @@ public:
 
   // Construct graph from dataset
   Graph(string filename) {
+    cout << "Constructing Graph from file......" << endl;
+
     ifstream dataset_stream(filename);
     string line;
 
