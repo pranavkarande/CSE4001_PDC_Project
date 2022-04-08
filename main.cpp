@@ -169,7 +169,6 @@ double Graph::BFS_serial(unsigned long int s_id) {
 
   double start_time = omp_get_wtime();
   // BFS algorithm
-  // for (u = Q.front(); !Q.empty(); u->discovered_parallel = true) {
   while (!Q.empty()) {
     u = Q.front();
     Q.pop();
@@ -228,7 +227,6 @@ double Graph::BFS_parallel(unsigned long int s_id) {
 
   double start_time = omp_get_wtime();
   // BFS algorithm
-  // for (u = Q.front(); !Q.empty(); u->discovered_parallel = true) {
   while (!Q.empty()) {
     u = Q.front();
     Q.pop();
