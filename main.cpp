@@ -3,11 +3,12 @@
 #include <iostream>
 #include <omp.h>
 #include <queue>
+#include <boost/lockfree/queue.hpp>
 #include <sstream>
 #include <string>
 #include <vector>
 
-#define NO_OF_THREADS 4
+#define NO_OF_THREADS 6
 
 using namespace std;
 
@@ -169,7 +170,6 @@ double Graph::BFS_serial(unsigned long int s_id) {
 
   double start_time = omp_get_wtime();
   // BFS algorithm
-  // for (u = Q.front(); !Q.empty(); u->discovered_parallel = true) {
   while (!Q.empty()) {
     u = Q.front();
     Q.pop();
@@ -202,7 +202,7 @@ double Graph::BFS_parallel(unsigned long int s_id) {
   Node *s = &N[s_id];
 
   // BFS Queue
-  queue<Node *> Q;
+  boost::lockfree::queue<Node *> Q(0);
 
   Node *u;
 
@@ -228,17 +228,14 @@ double Graph::BFS_parallel(unsigned long int s_id) {
 
   double start_time = omp_get_wtime();
   // BFS algorithm
-  // for (u = Q.front(); !Q.empty(); u->discovered_parallel = true) {
   while (!Q.empty()) {
-    u = Q.front();
-    Q.pop();
+    Q.pop(u);
     #pragma omp parallel for schedule(auto)
     for (unsigned long int v = 0; v < no_of_nodes; ++v) {
       if ((edgeMatrix[u->id][v]) && (!N[v].discovered_parallel)) {
         N[v].discovered_parallel = true;
         N[v].d_parallel = u->d_parallel + 1;
 
-        #pragma omp critical
         Q.push(&N[v]);
       }
     }
