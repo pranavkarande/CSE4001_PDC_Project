@@ -1,0 +1,13 @@
+* Review 2
+** Explain parallel algorithm
+** Roadmap for Review 3
+* Review 3
+** Write bash script
+- Automatically check number of cores in CPU
+- Generate data and write to a file
+** Explore queue parallely
+[[https://gist.github.com/stormxuwz/1c9c4bb52016f83ac79f][Gist]]
+** Use adjacency list instead of matrix
+Matrix is simple but uses large memory. Preferred for dense graphs.
+Large graphs are usually sparse so list will save memory.
+** Readme
