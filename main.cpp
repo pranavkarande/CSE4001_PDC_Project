@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-#define NO_OF_THREADS 6
+#define NO_OF_THREADS 4
 
 using namespace std;
 
@@ -230,7 +230,7 @@ double Graph::BFS_parallel(unsigned long int s_id) {
   // BFS algorithm
   while (!Q.empty()) {
     Q.pop(u);
-    #pragma omp parallel for schedule(auto)
+    #pragma omp parallel for schedule(static)
     for (unsigned long int v = 0; v < no_of_nodes; ++v) {
       if ((edgeMatrix[u->id][v]) && (!N[v].discovered_parallel)) {
         N[v].discovered_parallel = true;
@@ -239,12 +239,11 @@ double Graph::BFS_parallel(unsigned long int s_id) {
         Q.push(&N[v]);
       }
     }
-    u->discovered_parallel = true;
 
+    // Updating progress bar
     bar.set_option(option::PostfixText{to_string(++no_of_nodes_discovered) +
                                        "/" + to_string(no_of_reachable_nodes) +
                                        " nodes discovered"});
-
     bar.tick();
   }
   double end_time = omp_get_wtime();
