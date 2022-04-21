@@ -9,12 +9,14 @@ no_of_threads = os.cpu_count()
 files = ['p2p-Gnutella08.txt', 'test.txt', 'soc-Epinions1.txt']
 
 f = open('output.txt', 'w')
+__file__ = "main"
+file_path = os.path.dirname(os.path.realpath(__file__))+'/main'
 
 for file_name in files:
     f.write("Time taken for "+file_name+':'+'\n')
     for _ in range(3):
         print('Running on 1 thread...', end='\r')
-        p = subprocess.run(['/workspace/CSE4001_PDC_Project/main', '1',
+        p = subprocess.run([file_path, '1',
                             file_name], capture_output=True)
         x = p.stdout.decode("utf-8")
         splitting = x.split('h')
@@ -23,7 +25,7 @@ for file_name in files:
 
     for i in range(2, no_of_threads+1):
         print('Running on', str(i), 'threads...', end='\r')
-        p = subprocess.run(['/workspace/CSE4001_PDC_Project/main', str(i),
+        p = subprocess.run([file_path, str(i),
                             file_name], capture_output=True)
         x = p.stdout.decode("utf-8")
         splitting = x.split('h')
