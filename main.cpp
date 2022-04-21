@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-#define NO_OF_THREADS 4
+unsigned short int NO_OF_THREADS;
 
 using namespace std;
 
@@ -59,8 +59,6 @@ public:
 
   // Construct graph from dataset
   Graph(string filename) {
-    cout << "Constructing Graph from file......" << endl;
-
     ifstream dataset_stream(filename);
     string line;
 
@@ -135,13 +133,13 @@ public:
   }
 
   // Serial BFS
-  double BFS_serial(unsigned long int);
+  double BFS_serial(unsigned long int, bool);
 
   // Parallel BFS
-  double BFS_parallel(unsigned long int);
+  double BFS_parallel(unsigned long int, bool);
 };
 
-double Graph::BFS_serial(unsigned long int s_id) {
+double Graph::BFS_serial(unsigned long int s_id, bool is_verbose) {
   // s is now pointer to source
   Node *s = &N[s_id];
 
@@ -160,13 +158,15 @@ double Graph::BFS_serial(unsigned long int s_id) {
 
   Q.push(s);
 
-  using namespace indicators;
-  BlockProgressBar bar{
-      option::BarWidth{80}, option::ForegroundColor{Color::white},
-      option::FontStyles{vector<FontStyle>{FontStyle::bold}},
-      option::MaxProgress{no_of_reachable_nodes}};
+  indicators::show_console_cursor(false);
 
-  cout << "\nPerforming Serial BFS" << endl;
+  using namespace indicators;
+  BlockProgressBar bar{option::BarWidth{80},
+                       option::ForegroundColor{Color::white},
+                       option::FontStyles{vector<FontStyle>{FontStyle::bold}},
+                       option::MaxProgress{no_of_reachable_nodes}};
+  if (is_verbose)
+    cout << "\nPerforming Serial BFS" << endl;
 
   double start_time = omp_get_wtime();
   // BFS algorithm
@@ -183,21 +183,26 @@ double Graph::BFS_serial(unsigned long int s_id) {
     u->discovered_serial = true;
 
 
-    bar.set_option(option::PostfixText{to_string(++no_of_nodes_discovered) + "/" +
-                                       to_string(no_of_reachable_nodes) + " nodes discovered"});
+    if (is_verbose) {
+      bar.set_option(option::PostfixText{
+          to_string(++no_of_nodes_discovered) + "/" +
+          to_string(no_of_reachable_nodes) + " nodes discovered"});
 
-    bar.tick();
+      bar.tick();
+    }
   }
 
   double end_time = omp_get_wtime();
 
-  bar.mark_as_completed();
+  if (is_verbose)
+    bar.mark_as_completed();
+
   indicators::show_console_cursor(true);
 
   return (end_time - start_time);
 }
 
-double Graph::BFS_parallel(unsigned long int s_id) {
+double Graph::BFS_parallel(unsigned long int s_id, bool is_verbose) {
   // s is now pointer to source
   Node *s = &N[s_id];
 
@@ -224,6 +229,7 @@ double Graph::BFS_parallel(unsigned long int s_id) {
                        option::FontStyles{vector<FontStyle>{FontStyle::bold}},
                        option::MaxProgress{no_of_reachable_nodes}};
 
+  if (is_verbose)
   cout << "\nPerforming Parallel BFS" << endl;
 
   double start_time = omp_get_wtime();
@@ -240,40 +246,68 @@ double Graph::BFS_parallel(unsigned long int s_id) {
       }
     }
 
-    // Updating progress bar
-    bar.set_option(option::PostfixText{to_string(++no_of_nodes_discovered) +
-                                       "/" + to_string(no_of_reachable_nodes) +
-                                       " nodes discovered"});
-    bar.tick();
+    if (is_verbose) {
+      // Updating progress bar
+      bar.set_option(option::PostfixText{to_string(++no_of_nodes_discovered) +
+                                        "/" + to_string(no_of_reachable_nodes) +
+                                        " nodes discovered"});
+      bar.tick();
+    }
   }
   double end_time = omp_get_wtime();
 
+  if (is_verbose)
   bar.mark_as_completed();
+
   indicators::show_console_cursor(true);
 
   return (end_time - start_time);
 }
 
-int main(void) {
-  omp_set_num_threads(NO_OF_THREADS);
-
-  Graph G("soc-Epinions1.txt");
-  // Graph G("test.txt");
-  // Graph G("p2p-Gnutella08.txt");
-
-  double serial_time = G.BFS_serial(0);
-  cout << "\nSerial time: " << serial_time << " seconds" << endl;
-
-  double parallel_time = G.BFS_parallel(0);
-
-  if (!G.check_BFS_parallel()) {
-    cout << "Parallel BFS ran incorrectly!\n" << endl;
+int main(int argc, char *argv[]) {
+  if (argc < 3) {
+    cout << "Usage: ./main <Number of threads> <Filename of dataset> [-v/--verbose]" << endl;
     return 1;
   }
 
-  cout << "\nParallel BFS ran correctly!" << endl;
+  NO_OF_THREADS = atoi(argv[1]);
 
-  cout << "Parallel time: " << parallel_time << " seconds" << endl;
+  bool verbose = (argc > 3);
 
-  return 0;
+  // Graph G("soc-Epinions1.txt");
+  // Graph G("test.txt");
+  Graph G(argv[2]);
+
+  omp_set_num_threads(NO_OF_THREADS);
+
+
+  if (verbose) {
+    // Non-verbose operation
+
+    double serial_time = G.BFS_serial(0, true);
+    cout << "\nSerial time: " << serial_time << " seconds" << endl;
+
+    double parallel_time = G.BFS_parallel(0, true);
+
+    if (!G.check_BFS_parallel()) {
+      cout << "Parallel BFS ran incorrectly!\n" << endl;
+      return 1;
+    }
+
+    cout << "\nParallel BFS ran correctly!" << endl;
+
+    cout << "Parallel time: " << parallel_time << " seconds" << endl;
+
+    return 0;
+  } else {
+    // Non-verbose operation
+
+    if (NO_OF_THREADS == 1) {
+      cout << G.BFS_serial(0, false) << endl;
+    } else {
+      cout << G.BFS_parallel(0, false) << endl;
+    }
+
+    return 0;
+  }
 }
