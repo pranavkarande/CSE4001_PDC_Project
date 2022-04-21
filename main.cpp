@@ -265,18 +265,18 @@ double Graph::BFS_parallel(unsigned long int s_id, bool is_verbose) {
 }
 
 int main(int argc, char *argv[]) {
-  if (argc < 2) {
-    cout << "Usage: ./main <Number of threads> [-v/--verbose]" << endl;
+  if (argc < 3) {
+    cout << "Usage: ./main <Number of threads> <Filename of dataset> [-v/--verbose]" << endl;
     return 1;
   }
 
   NO_OF_THREADS = atoi(argv[1]);
 
-  bool verbose = (argc > 2);
+  bool verbose = (argc > 3);
 
   // Graph G("soc-Epinions1.txt");
   // Graph G("test.txt");
-  Graph G("p2p-Gnutella08.txt");
+  Graph G(argv[2]);
 
   omp_set_num_threads(NO_OF_THREADS);
 
