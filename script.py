@@ -3,6 +3,8 @@ import subprocess
 import sys
 import platform
 
+os.system('g++ main.cpp -o main -fopenmp')
+
 output = []
 single_thread_sum = 0.0
 no_of_threads = os.cpu_count()
