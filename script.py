@@ -17,7 +17,7 @@ file_path = os.path.dirname(os.path.realpath(__file__))+'/main'
 for file_name in files:
     f.write("Time taken for "+file_name+':'+'\n')
     for _ in range(3):
-        print('Running on 1 thread...', end='\r')
+        print(file_name+': Running on 1 thread...')
         p = subprocess.run([file_path, '1',
                             file_name], capture_output=True)
         x = p.stdout.decode("utf-8")
@@ -26,14 +26,14 @@ for file_name in files:
     output.append(single_thread_sum)
 
     for i in range(2, no_of_threads+1):
-        print('Running on', str(i), 'threads...', end='\r')
+        print(file_name+': Running on', str(i), 'threads...')
         p = subprocess.run([file_path, str(i),
                             file_name], capture_output=True)
         x = p.stdout.decode("utf-8")
         splitting = x.split('h')
         output.append(float(splitting[1]))
 
-    for i in range(16):
+    for i in range(no_of_threads):
         element = output[i]
         element = f'{element:.3f}'
         f.write(str(i+1)+'. '+str(element)+'\n')
